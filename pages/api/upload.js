@@ -1,5 +1,4 @@
 import formidable from "formidable";
-import fs from "fs";
 
 export async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
@@ -11,17 +10,22 @@ export async function handler(req, res) {
     const { wallet } = fields;
     const file = files.file[0];
     const filePath = file.filepath;
-    const fileData = fs.readFileSync(filePath);
 
-    const msg = {
-      to: "bbroad25@gmail.com",
-      from: "no-reply@yourdomain.com",
-      subject: "Your Subject Here", // Ensure this line is complete
-      text: "The body of the email here"
-    };
+    // Use fs only on the server side
+    if (typeof window === "undefined") {
+      const fs = require("fs");  // Dynamically require fs only on the server
+      const fileData = fs.readFileSync(filePath);
 
-    // Add logic to send the email (e.g., using a service like SendGrid, Nodemailer, etc.)
-    // Example: await sendEmail(msg);
+      const msg = {
+        to: "bbroad25@gmail.com",
+        from: "no-reply@yourdomain.com",
+        subject: "Your Subject Here",
+        text: "The body of the email here"
+      };
+
+      // Add your email-sending logic here (e.g., using SendGrid)
+      // Example: await sendEmail(msg);
+    }
 
     return res.status(200).json({ message: "File uploaded successfully!" });
   });
